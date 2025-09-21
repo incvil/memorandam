@@ -9,6 +9,8 @@
 
 ## git
 ### pre_commit_dll_version
-- gitでexeやdllを管理する場合、バージョンアップだけを認めるpre_commit。
-- 日本語ファイルパスを扱う場合、このおまじないが必要。
--- git config --global core.quotepath false
+Windows 11のgitでexeやdllを管理する場合、バージョンアップだけを認めるpre_commit。
+* 使い方
+    * pre-commitとpre-commit.ps1を.git\hooksへコピーする
+* 日本語ファイルパスを扱う場合、事前にこのおまじないが必要。
+    * git config --global core.quotepath false
