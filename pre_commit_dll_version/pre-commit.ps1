@@ -1,19 +1,20 @@
 #
 # exeとdllのバージョンが上がらないとコミットさせない
 #
+
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+
 Write-Host "pre-commit script checks file version"
-Write-Host "To properly handle file paths containing Japanese character 'git config --global core.quotepath false'"
+Write-Host "To properly handle file paths containing Japanese character, run 'git config --global core.quotepath false'"
 
 function SaveHead {
     param(
         [String]$git_file_name,
         [String]$out_file_name
     )
-
-    Write-Host "SaveHead -git_file_name $git_file_name -out_file_name $out_file_name"
+    #Write-Host "SaveHead -git_file_name $git_file_name -out_file_name $out_file_name"
 
     [System.Diagnostics.ProcessStartInfo]$psi = New-Object -TypeName System.Diagnostics.ProcessStartInfo
-
     $psi.WorkingDirectory = (Get-Location).Path
     $psi.RedirectStandardOutput = $true
     $psi.UseShellExecute = $false
@@ -32,13 +33,11 @@ function SaveHead {
     $proc.Dispose()
 }
 
-
 $ErrorActionPreference = "Stop"
 
 # コミット予定の dll/exe を取得
-
 $staged = git diff --cached --name-only --diff-filter=ACM
-$files = $staged | Where-Object { $_ -match "\w.dll" }
+$files = $staged | Where-Object { $_ -match "\w.dll" -or $_ -match "\w.exe" }
 #Write-Host "$files"
 
 $tmpFile = New-TemporaryFile
@@ -46,9 +45,8 @@ if (Test-Path $tmpFile) {
     #Write-Host "tmp file exists:$tmpFile"
 }
 
-
 foreach ($file in $files) {
-    #Write-Host "checking $file"
+    Write-Host "checking $file"
     if (-not (Test-Path $file)) { continue }
 
     # 現在のファイルのバージョン
@@ -57,10 +55,9 @@ foreach ($file in $files) {
     } catch {
         continue
     }
-    #Write-Host "verion of new file is $newVer"
+    #Write-Host "version of new file is $newVer"
 
     # git管理下の前回のバージョンを tmp に保存
-
     SaveHead -git_file_name $file -out_file_name $tmpFile
 
     try {
@@ -72,7 +69,7 @@ foreach ($file in $files) {
     if ($newVer -gt $oldVer) {
         Write-Host "Version of $file changed from $oldVer to $newVer."
     } else {
-        Write-Host "Since version of $file is not grater($NewVer), quit to commit."
+        Write-Host "Since version ($oldVer) of $file is not grater than ($newVer), quit to commit."
         exit 1
     }
 }
@@ -80,4 +77,3 @@ foreach ($file in $files) {
 Remove-Item $tmpFile -Force
 
 exit 0
-
