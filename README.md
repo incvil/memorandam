@@ -4,7 +4,8 @@
 ```
 .
 └── git/
-    └── pre_commit_dll_version/
+    ├── pre_commit_dll_version/
+    └── nanoclaw/
 ```
 
 ## git
@@ -14,3 +15,7 @@ Windows 11のgitでexeやdllを管理する場合、バージョンアップだ�
     * pre-commitを.git\hooksへコピーする
 * 日本語ファイルパスを扱う場合、事前にこのおまじないが必要。
     * git config --global core.quotepath false
+
+### nanoclaw
+RTX2070でlocal LLMをバックエンドにしてnanoclawを動かそうとした記録。
+
